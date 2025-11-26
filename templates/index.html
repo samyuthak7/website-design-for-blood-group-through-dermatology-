@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Blood Group Detection</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <!-- Background video -->
+  <video autoplay muted loop id="bg-video">
+    <source src="{{ url_for('static', filename='videos/background.mp4') }}" type="video/mp4">
+  </video>
+
+  <!-- Transparent centered UI box -->
+  <div class="ui-box">
+    <h1>Blood Group Prediction Through Fingerprint</h1>
+    <h3>Blood-Cell-Cloud</h3>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+      <label for="file" class="file-label">Choose File</label>
+      <input type="file" name="file" id="file" multiple accept="image/*">
+      <span id="file-name"></span><br>
+      <button type="submit">Predict</button>
+    </form>
+
+    <div id="progress"><div id="bar"></div></div>
+    <div id="predictions"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('file');
+    const fileNameSpan = document.getElementById('file-name');
+    const predictionsDiv = document.getElementById('predictions');
+    const progress = document.getElementById('progress');
+    const bar = document.getElementById('bar');
+
+    fileInput.addEventListener('change', () => {
+      const names = Array.from(fileInput.files).map(f => f.name).join(', ');
+      fileNameSpan.textContent = names ? `Selected: ${names}` : '';
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      predictionsDiv.innerHTML = '';
+      progress.style.display = 'block';
+      bar.style.width = '10%';
+
+      const files = fileInput.files;
+      const formData = new FormData();
+      for (let f of files) formData.append('file', f);
+
+      const res = await fetch('/predict', { method: 'POST', body: formData });
+      bar.style.width = '70%';
+      let data;
+      try { data = await res.json(); } 
+      catch(err) { predictionsDiv.innerHTML = "<b>Error parsing response</b>"; progress.style.display='none'; return; }
+
+      bar.style.width = '100%';
+      progress.style.display = 'none';
+
+      if (data.predictions) {
+        predictionsDiv.innerHTML = '<b>Predicted Blood Group:</b><br>' +
+          data.predictions.map(p => `<div>${p}</div>`).join('');
+      } else {
+        predictionsDiv.innerHTML = '<b>Error:</b> ' + data.error;
+      }
+    });
+  </script>
+</body>
+</html>
