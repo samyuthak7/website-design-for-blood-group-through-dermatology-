@@ -64,20 +64,6 @@ Predicted Blood Group
 
  📂 Project Structure
 
-```
-📁 BloodGroupDetection
-│── data/
-│── models/
-│── src/
-│   ├── preprocessing.py
-│   ├── feature_extraction.py
-│   ├── genetic_algorithm.py
-│   ├── cnn_model.py
-│   └── predict.py
-│── README.md
-│── requirements.txt
-│── main.py
-```
 
 ---
 
@@ -125,6 +111,7 @@ python main.py
 This project is released under the **MIT License**.
 
 ---
+
 
 
 
